@@ -12,8 +12,8 @@ void showHelp() {
     std::cout << "hello   - 'Hello, World!' 출력" << std::endl;
     std::cout << "time    - 현재 시스템 시간 출력" << std::endl;
     std::cout << "list    - 현재 디렉토리의 파일 목록 출력" << std::endl;
-    std::cout << "create  - 새로운 텍스트 파일 생성" << std::endl;
-    std::cout << "random  - 1에서 100 사이의 랜덤 숫자 출력" << std::endl;
+    std::cout << "create  - 새로운 텍스트 파일 생성 (이름 및 내용 입력)" << std::endl;
+    std::cout << "random  - 범위를 지정하여 랜덤 숫자 출력" << std::endl;
     std::cout << "open    - 입력한 웹사이트 열기 (URL 변환 포함)" << std::endl;
     std::cout << "exit    - 프로그램 종료" << std::endl;
 }
@@ -36,12 +36,22 @@ void listFiles() {
 }
 
 void createFile() {
-    std::string fileName;
+    std::string fileName, fileContent;
     std::cout << "생성할 파일 이름을 입력하세요: ";
     std::getline(std::cin, fileName);
+    std::cout << "파일에 작성할 내용을 입력하세요 (줄 바꿈은 %nl% 사용): ";
+    std::getline(std::cin, fileContent);
+
+    // '%nl%'을 줄 바꿈('\n')으로 변환
+    size_t pos;
+    while ((pos = fileContent.find("%nl%")) != std::string::npos) {
+        fileContent.replace(pos, 4, "\n");
+    }
+
     std::ofstream file(fileName);
     if (file.is_open()) {
-        std::cout << fileName << " 파일이 생성되었습니다." << std::endl;
+        file << fileContent;
+        std::cout << fileName << " 파일이 생성되었습니다. 내용:\n" << fileContent << std::endl;
         file.close();
     }
     else {
@@ -50,9 +60,19 @@ void createFile() {
 }
 
 void generateRandomNumber() {
-    srand(static_cast<unsigned>(time(0)));
-    int randomNum = rand() % 100 + 1;
-    std::cout << "생성된 랜덤 숫자: " << randomNum << std::endl;
+    int range;
+    std::cout << "수를 지정하세요 (예: 32를 입력하면 1~32까지 범위): ";
+    std::cin >> range;
+    std::cin.ignore(); // 입력 버퍼 초기화
+
+    if (range > 0) {
+        srand(static_cast<unsigned>(time(0)));
+        int randomNum = rand() % range + 1;
+        std::cout << "생성된 랜덤 숫자: " << randomNum << std::endl;
+    }
+    else {
+        std::cout << "올바른 수를 입력하세요!" << std::endl;
+    }
 }
 
 void openWebsite() {
@@ -103,13 +123,8 @@ void handleCommand(const std::string& command) {
 
 int main() {
     std::string command;
-    std::cout << " " << std::endl;
     std::cout << "==<< 명령어 도우미 >>==" << std::endl;
     std::cout << "명령어를 입력하세요. ('help'를 입력해 도움말 확인 가능)" << std::endl;
-    std::cout << "사용법에 대해서 알아보시려면, '사용법'이라고 검색하여 주십시오." << std::endl;
-    std::cout << "Made by Seo min seok. 2025 version '1.0' " << std::endl;
-    std::cout << "초기 버전이며, 버그가 날수도 있습니다. " << std::endl;
-    std::cout << " " << std::endl;
     while (true) {
         std::cout << "> ";
         std::getline(std::cin, command);
